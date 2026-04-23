@@ -25,8 +25,18 @@ from .const import (
 )
 
 
-def _base_schema(defaults: dict | None = None) -> vol.Schema:
+def _notify_service_options(hass) -> list[str]:
+    """Return all currently-registered notify.* service names as 'notify.xxx'."""
+    try:
+        services = hass.services.async_services().get("notify", {}) or {}
+    except Exception:  # hass may be None in some contexts
+        services = {}
+    return sorted(f"notify.{name}" for name in services.keys())
+
+
+def _base_schema(defaults: dict | None = None, notify_options: list[str] | None = None) -> vol.Schema:
     d = defaults or {}
+    notify_opts = notify_options or []
     return vol.Schema({
         vol.Required(CONF_POWER_SENSOR,
                      default=d.get(CONF_POWER_SENSOR)):
@@ -40,8 +50,13 @@ def _base_schema(defaults: dict | None = None) -> vol.Schema:
             ),
         vol.Optional(CONF_NOTIFY_TARGETS,
                      default=d.get(CONF_NOTIFY_TARGETS, [])):
-            selector.EntitySelector(
-                selector.EntitySelectorConfig(domain="notify", multiple=True)
+            selector.SelectSelector(
+                selector.SelectSelectorConfig(
+                    options=notify_opts,
+                    multiple=True,
+                    custom_value=True,
+                    mode=selector.SelectSelectorMode.DROPDOWN,
+                )
             ),
         vol.Required(CONF_START_POWER_W,
                      default=d.get(CONF_START_POWER_W, DEFAULT_START_POWER_W)):
@@ -125,7 +140,11 @@ class WashingMachineConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 title="Washing Machine",
                 data=user_input,
             )
-        return self.async_show_form(step_id="user", data_schema=_base_schema(), errors=errors)
+        return self.async_show_form(
+            step_id="user",
+            data_schema=_base_schema(notify_options=_notify_service_options(self.hass)),
+            errors=errors,
+        )
 
     @staticmethod
     @callback
@@ -144,4 +163,10 @@ class WashingMachineOptionsFlow(config_entries.OptionsFlow):
             return self.async_create_entry(title="", data=user_input)
         merged = dict(self.entry.data)
         merged.update(self.entry.options)
-        return self.async_show_form(step_id="init", data_schema=_base_schema(merged))
+        return self.async_show_form(
+            step_id="init",
+            data_schema=_base_schema(
+                defaults=merged,
+                notify_options=_notify_service_options(self.hass),
+            ),
+        )
