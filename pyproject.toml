@@ -1,0 +1,9 @@
+[project]
+name = "ha-washing-machine"
+version = "0.1.0"
+description = "Home Assistant custom integration for washing machine tracking"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]

@@ -1,0 +1,51 @@
+simulate_cycle:
+  name: Simulate Cycle
+  description: >
+    Runs a compressed end-to-end test cycle: Started → Done → reminder (skipped) → Door Open.
+    Useful for verifying notifications and dashboard behavior without waiting for a real wash.
+  fields:
+    entry_id:
+      name: Config entry ID
+      description: Config entry ID of the Washing Machine to simulate. Omit to simulate all.
+      required: false
+      selector:
+        text:
+
+mark_handled:
+  name: Mark handled
+  description: Force-exit DONE state as if the door were opened (no unload time recorded).
+  fields:
+    entry_id:
+      name: Config entry ID
+      required: false
+      selector:
+        text:
+
+reset_error:
+  name: Reset error
+  description: Clear ERROR state and return to IDLE.
+  fields:
+    entry_id:
+      name: Config entry ID
+      required: false
+      selector:
+        text:
+
+set_total_washes:
+  name: Set total washes
+  description: Manually set the lifetime wash counter (for migration / correction).
+  fields:
+    entry_id:
+      name: Config entry ID
+      required: false
+      selector:
+        text:
+    total:
+      name: Total
+      description: New total_washes value
+      required: true
+      selector:
+        number:
+          min: 0
+          max: 1000000
+          mode: box

@@ -1,0 +1,47 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Washing Machine",
+        "description": "Configure your washing machine's power and door sensors.",
+        "data": {
+          "power_sensor": "Power sensor",
+          "door_sensor": "Door sensor",
+          "notify_targets": "Notification targets",
+          "start_power_w": "Start power threshold (W)",
+          "start_duration_s": "Start duration (seconds)",
+          "end_power_w": "End power threshold (W)",
+          "end_duration_s": "End duration (seconds)",
+          "reminder_interval_m": "Reminder interval (minutes)",
+          "reminder_start_hour": "Reminder start hour",
+          "reminder_end_hour": "Reminder end hour",
+          "error_duration_h": "Error timeout (hours)",
+          "door_open_state": "Door sensor open state",
+          "starting_total": "Starting total washes (migration)"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Washing Machine Settings",
+        "data": {
+          "power_sensor": "Power sensor",
+          "door_sensor": "Door sensor",
+          "notify_targets": "Notification targets",
+          "start_power_w": "Start power threshold (W)",
+          "start_duration_s": "Start duration (seconds)",
+          "end_power_w": "End power threshold (W)",
+          "end_duration_s": "End duration (seconds)",
+          "reminder_interval_m": "Reminder interval (minutes)",
+          "reminder_start_hour": "Reminder start hour",
+          "reminder_end_hour": "Reminder end hour",
+          "error_duration_h": "Error timeout (hours)",
+          "door_open_state": "Door sensor open state",
+          "starting_total": "Starting total washes"
+        }
+      }
+    }
+  }
+}
