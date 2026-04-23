@@ -239,6 +239,47 @@ async def test_reset_error(coord, hass, clock):
 
 
 @pytest.mark.asyncio
+async def test_extra_reminders_merged_into_pool(hass, entry, clock):
+    """Extra reminder messages get appended to the default pool."""
+    entry.options = {C.CONF_EXTRA_REMINDERS: "Custom message A\nCustom message B"}
+    from washing_machine.coordinator import WashingMachineCoordinator
+    c = WashingMachineCoordinator(hass, entry)
+    await c.async_load()
+    pool = c.reminder_pool
+    assert "Custom message A" in pool
+    assert "Custom message B" in pool
+    # Defaults preserved
+    assert len(pool) == 10 + 2
+
+
+@pytest.mark.asyncio
+async def test_extra_thank_you_tiers(hass, entry, clock):
+    """Extra thank-you tiers start at load count 6."""
+    entry.options = {C.CONF_EXTRA_THANK_YOU: "Six loads!\nSeven loads!"}
+    from washing_machine.coordinator import WashingMachineCoordinator
+    c = WashingMachineCoordinator(hass, entry)
+    await c.async_load()
+    tiers = c.thank_you_tiers_all
+    assert (6, "Six loads!") in tiers
+    assert (7, "Seven loads!") in tiers
+    # Existing 1-5 tiers preserved
+    assert len([t for t in tiers if t[0] <= 5]) == 5
+
+
+@pytest.mark.asyncio
+async def test_extra_config_list_or_string(hass, entry, clock):
+    """Extra config accepts both list and string formats (defensive parsing)."""
+    entry.options = {C.CONF_EXTRA_REMINDERS: ["List item 1", "List item 2", ""]}
+    from washing_machine.coordinator import WashingMachineCoordinator
+    c = WashingMachineCoordinator(hass, entry)
+    await c.async_load()
+    pool = c.reminder_pool
+    assert "List item 1" in pool
+    assert "List item 2" in pool
+    assert "" not in pool  # blank entries filtered
+
+
+@pytest.mark.asyncio
 async def test_counters_cannot_exceed_total(coord, hass, clock):
     """washes_today/week/month can never exceed total_washes (the old bug)."""
     from datetime import timezone

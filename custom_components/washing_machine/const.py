@@ -19,6 +19,8 @@ CONF_REMINDER_END_HOUR = "reminder_end_hour"
 CONF_ERROR_DURATION_H = "error_duration_h"
 CONF_DOOR_OPEN_STATE = "door_open_state"
 CONF_STARTING_TOTAL = "starting_total"
+CONF_EXTRA_REMINDERS = "extra_reminders"
+CONF_EXTRA_THANK_YOU = "extra_thank_you"
 
 # Defaults
 DEFAULT_START_POWER_W = 5.0

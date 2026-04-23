@@ -17,6 +17,7 @@ from .const import (
     CONF_END_POWER_W, CONF_END_DURATION_S,
     CONF_REMINDER_INTERVAL_M, CONF_REMINDER_START_HOUR, CONF_REMINDER_END_HOUR,
     CONF_ERROR_DURATION_H, CONF_DOOR_OPEN_STATE, CONF_STARTING_TOTAL,
+    CONF_EXTRA_REMINDERS, CONF_EXTRA_THANK_YOU,
     DEFAULT_START_POWER_W, DEFAULT_START_DURATION_S,
     DEFAULT_END_POWER_W, DEFAULT_END_DURATION_S,
     DEFAULT_REMINDER_INTERVAL_M, DEFAULT_REMINDER_START_HOUR, DEFAULT_REMINDER_END_HOUR,
@@ -98,6 +99,12 @@ def _base_schema(defaults: dict | None = None) -> vol.Schema:
             selector.NumberSelector(
                 selector.NumberSelectorConfig(min=0, max=1000000, step=1, mode="box")
             ),
+        vol.Optional(CONF_EXTRA_REMINDERS,
+                     default=d.get(CONF_EXTRA_REMINDERS, "")):
+            selector.TextSelector(selector.TextSelectorConfig(multiline=True)),
+        vol.Optional(CONF_EXTRA_THANK_YOU,
+                     default=d.get(CONF_EXTRA_THANK_YOU, "")):
+            selector.TextSelector(selector.TextSelectorConfig(multiline=True)),
     })
 
 

@@ -17,7 +17,9 @@
           "reminder_end_hour": "Reminder end hour (0-24)",
           "error_duration_h": "Error timeout (hours)",
           "door_open_state": "Door sensor open state",
-          "starting_total": "Starting total washes (migration seed, 0 = fresh)"
+          "starting_total": "Starting total washes (migration seed, 0 = fresh)",
+          "extra_reminders": "Extra reminder messages (one per line — added to the 10 defaults; a random one is picked each hour)",
+          "extra_thank_you": "Extra thank-you tiers (one per line — first line = 6 loads/day, second = 7, and so on)"
         }
       }
     }
@@ -39,7 +41,9 @@
           "reminder_end_hour": "Reminder end hour (0-24)",
           "error_duration_h": "Error timeout (hours)",
           "door_open_state": "Door sensor open state",
-          "starting_total": "Starting total washes"
+          "starting_total": "Starting total washes",
+          "extra_reminders": "Extra reminder messages (one per line)",
+          "extra_thank_you": "Extra thank-you tiers (line 1 = 6 loads/day, line 2 = 7, ...)"
         }
       }
     }

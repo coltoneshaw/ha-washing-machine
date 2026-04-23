@@ -31,6 +31,7 @@ from .const import (
     CONF_END_POWER_W, CONF_END_DURATION_S,
     CONF_REMINDER_INTERVAL_M, CONF_REMINDER_START_HOUR, CONF_REMINDER_END_HOUR,
     CONF_ERROR_DURATION_H, CONF_DOOR_OPEN_STATE, CONF_STARTING_TOTAL,
+    CONF_EXTRA_REMINDERS, CONF_EXTRA_THANK_YOU,
     DEFAULT_START_POWER_W, DEFAULT_START_DURATION_S,
     DEFAULT_END_POWER_W, DEFAULT_END_DURATION_S,
     DEFAULT_REMINDER_INTERVAL_M, DEFAULT_REMINDER_START_HOUR, DEFAULT_REMINDER_END_HOUR,
@@ -244,6 +245,26 @@ class WashingMachineCoordinator(DataUpdateCoordinator[PersistedState]):
     @property
     def reminders_sent(self) -> int:
         return self._state.reminders_sent
+
+    def _parse_lines(self, key: str) -> list[str]:
+        raw = self._opt.get(key) or ""
+        if isinstance(raw, list):
+            return [str(s).strip() for s in raw if str(s).strip()]
+        return [l.strip() for l in str(raw).splitlines() if l.strip()]
+
+    @property
+    def reminder_pool(self) -> list[str]:
+        """Default reminders + user extras (merged, random-selected at fire time)."""
+        return list(REMINDER_MESSAGES) + self._parse_lines(CONF_EXTRA_REMINDERS)
+
+    @property
+    def thank_you_tiers_all(self) -> list[tuple[int, str]]:
+        """Default 1-5 tiers + user-added tiers starting at load count 6."""
+        tiers = list(THANK_YOU_TIERS)
+        extras = self._parse_lines(CONF_EXTRA_THANK_YOU)
+        for i, msg in enumerate(extras):
+            tiers.append((6 + i, msg))
+        return tiers
 
     # ------------------------------------------------------------------
     # Persistence
@@ -462,8 +483,10 @@ class WashingMachineCoordinator(DataUpdateCoordinator[PersistedState]):
         midnight = dt_util.start_of_local_day(dt_util.as_local(now))
         midnight_utc = dt_util.as_utc(midnight)
         loads_today = self.washes_since(midnight_utc)
+        tiers = self.thank_you_tiers_all
         msg = THANK_YOU_OVERFLOW.format(n=loads_today)
-        for threshold, m in THANK_YOU_TIERS:
+        # exact match on tier threshold first; otherwise fall through to overflow
+        for threshold, m in tiers:
             if loads_today == threshold:
                 msg = m
                 break
@@ -473,7 +496,8 @@ class WashingMachineCoordinator(DataUpdateCoordinator[PersistedState]):
         self._notify(title="👏 Thank You!", message=msg, level="passive")
 
     async def _send_reminder(self, now: datetime) -> None:
-        msg = random.choice(REMINDER_MESSAGES)
+        pool = self.reminder_pool
+        msg = random.choice(pool) if pool else random.choice(REMINDER_MESSAGES)
         self._state.reminders_sent += 1
         self._state.last_reminder_at = now.isoformat()
         await self._save()

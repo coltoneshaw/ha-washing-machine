@@ -17,7 +17,9 @@
           "reminder_end_hour": "Reminder end hour",
           "error_duration_h": "Error timeout (hours)",
           "door_open_state": "Door sensor open state",
-          "starting_total": "Starting total washes (migration)"
+          "starting_total": "Starting total washes (migration)",
+          "extra_reminders": "Extra reminder messages (one per line)",
+          "extra_thank_you": "Extra thank-you tiers (line 1 = 6 loads, line 2 = 7, ...)"
         }
       }
     }
@@ -39,7 +41,9 @@
           "reminder_end_hour": "Reminder end hour",
           "error_duration_h": "Error timeout (hours)",
           "door_open_state": "Door sensor open state",
-          "starting_total": "Starting total washes"
+          "starting_total": "Starting total washes",
+          "extra_reminders": "Extra reminder messages (one per line)",
+          "extra_thank_you": "Extra thank-you tiers (line 1 = 6 loads, line 2 = 7, ...)"
         }
       }
     }
