@@ -281,6 +281,16 @@ class WashingMachineCoordinator(DataUpdateCoordinator[PersistedState]):
         v = (self._opt.get(CONF_THANK_YOU_OVERFLOW) or "").strip()
         return v or THANK_YOU_OVERFLOW
 
+    @staticmethod
+    def _format_count(template: str, n: int) -> str:
+        """Substitute count into a template. Supports %N% and legacy {n}."""
+        out = template.replace("%N%", str(n))
+        try:
+            out = out.format(n=n)
+        except (KeyError, IndexError, ValueError):
+            pass
+        return out
+
     # ------------------------------------------------------------------
     # Persistence
     # ------------------------------------------------------------------
@@ -499,7 +509,8 @@ class WashingMachineCoordinator(DataUpdateCoordinator[PersistedState]):
         midnight_utc = dt_util.as_utc(midnight)
         loads_today = self.washes_since(midnight_utc)
         tiers = self.thank_you_tiers_all
-        msg = self.thank_you_overflow.format(n=loads_today)
+        # Overflow supports both %N% (preferred) and legacy {n} placeholders
+        msg = self._format_count(self.thank_you_overflow, loads_today)
         # exact match on tier threshold first; otherwise fall through to overflow
         for threshold, m in tiers:
             if loads_today == threshold:
@@ -635,7 +646,7 @@ class WashingMachineCoordinator(DataUpdateCoordinator[PersistedState]):
             dt_util.as_utc(dt_util.start_of_local_day(dt_util.as_local(dt_util.utcnow())))
         ), 1)
         tiers = self.thank_you_tiers_all
-        msg = self.thank_you_overflow.format(n=loads_today)
+        msg = self._format_count(self.thank_you_overflow, loads_today)
         for threshold, m in tiers:
             if loads_today == threshold:
                 msg = m

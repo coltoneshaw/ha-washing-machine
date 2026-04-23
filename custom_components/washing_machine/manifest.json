@@ -1,7 +1,7 @@
 {
   "domain": "washing_machine",
   "name": "Washing Machine",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "codeowners": ["@coltoneshaw"],
   "config_flow": true,
   "dependencies": [],

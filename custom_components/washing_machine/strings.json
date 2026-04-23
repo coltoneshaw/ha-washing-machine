@@ -20,7 +20,7 @@
           "starting_total": "Starting total washes (migration seed, 0 = fresh)",
           "reminder_messages": "Reminder messages (one per line — pre-filled with defaults; edit, delete, or add. A random one is picked each hour.)",
           "thank_you_tiers": "Thank-you tier messages (line 1 = 1 load/day, line 2 = 2 loads, line 3 = 3, etc.)",
-          "thank_you_overflow": "Thank-you overflow message for N+ loads beyond the tier list ({n} is replaced with the count)"
+          "thank_you_overflow": "Thank-you overflow message for N+ loads beyond the tier list (use %N% where you want the count inserted)"
         }
       }
     }
@@ -45,7 +45,7 @@
           "starting_total": "Starting total washes",
           "reminder_messages": "Reminder messages (one per line)",
           "thank_you_tiers": "Thank-you tier messages",
-          "thank_you_overflow": "Thank-you overflow message (use {n} for count)"
+          "thank_you_overflow": "Thank-you overflow message (use %N% for count)"
         }
       }
     }

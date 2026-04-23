@@ -78,4 +78,4 @@ THANK_YOU_TIERS = [
     (4, "FOUR loads today. Either you have kids or you're running a secret laundromat."),
     (5, "Five loads?! At this point you're just showing off."),
 ]
-THANK_YOU_OVERFLOW = "{n} LOADS?! The washing machine is filing a restraining order."
+THANK_YOU_OVERFLOW = "%N% LOADS?! The washing machine is filing a restraining order."
