@@ -19,6 +19,11 @@ CONF_REMINDER_END_HOUR = "reminder_end_hour"
 CONF_ERROR_DURATION_H = "error_duration_h"
 CONF_DOOR_OPEN_STATE = "door_open_state"
 CONF_STARTING_TOTAL = "starting_total"
+# Full editable message lists (replace defaults). Blank = use defaults.
+CONF_REMINDER_MESSAGES = "reminder_messages"
+CONF_THANK_YOU_TIERS = "thank_you_tiers"
+CONF_THANK_YOU_OVERFLOW = "thank_you_overflow"
+# Legacy (v0.2.x extension fields) — migrated to new keys on first load
 CONF_EXTRA_REMINDERS = "extra_reminders"
 CONF_EXTRA_THANK_YOU = "extra_thank_you"
 

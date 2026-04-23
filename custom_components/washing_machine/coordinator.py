@@ -31,6 +31,7 @@ from .const import (
     CONF_END_POWER_W, CONF_END_DURATION_S,
     CONF_REMINDER_INTERVAL_M, CONF_REMINDER_START_HOUR, CONF_REMINDER_END_HOUR,
     CONF_ERROR_DURATION_H, CONF_DOOR_OPEN_STATE, CONF_STARTING_TOTAL,
+    CONF_REMINDER_MESSAGES, CONF_THANK_YOU_TIERS, CONF_THANK_YOU_OVERFLOW,
     CONF_EXTRA_REMINDERS, CONF_EXTRA_THANK_YOU,
     DEFAULT_START_POWER_W, DEFAULT_START_DURATION_S,
     DEFAULT_END_POWER_W, DEFAULT_END_DURATION_S,
@@ -254,17 +255,31 @@ class WashingMachineCoordinator(DataUpdateCoordinator[PersistedState]):
 
     @property
     def reminder_pool(self) -> list[str]:
-        """Default reminders + user extras (merged, random-selected at fire time)."""
+        """Full reminder messages: user-configured if present, else defaults.
+        Legacy extras are appended if the main list isn't set."""
+        main = self._parse_lines(CONF_REMINDER_MESSAGES)
+        if main:
+            return main
+        # Backwards compat: defaults + legacy extras
         return list(REMINDER_MESSAGES) + self._parse_lines(CONF_EXTRA_REMINDERS)
 
     @property
     def thank_you_tiers_all(self) -> list[tuple[int, str]]:
-        """Default 1-5 tiers + user-added tiers starting at load count 6."""
+        """Tiered thank-you messages: line N = message for N loads/day.
+        If unset, defaults (1-5) + legacy extras (6+) are used."""
+        main = self._parse_lines(CONF_THANK_YOU_TIERS)
+        if main:
+            return [(i + 1, msg) for i, msg in enumerate(main)]
         tiers = list(THANK_YOU_TIERS)
         extras = self._parse_lines(CONF_EXTRA_THANK_YOU)
         for i, msg in enumerate(extras):
             tiers.append((6 + i, msg))
         return tiers
+
+    @property
+    def thank_you_overflow(self) -> str:
+        v = (self._opt.get(CONF_THANK_YOU_OVERFLOW) or "").strip()
+        return v or THANK_YOU_OVERFLOW
 
     # ------------------------------------------------------------------
     # Persistence
@@ -484,7 +499,7 @@ class WashingMachineCoordinator(DataUpdateCoordinator[PersistedState]):
         midnight_utc = dt_util.as_utc(midnight)
         loads_today = self.washes_since(midnight_utc)
         tiers = self.thank_you_tiers_all
-        msg = THANK_YOU_OVERFLOW.format(n=loads_today)
+        msg = self.thank_you_overflow.format(n=loads_today)
         # exact match on tier threshold first; otherwise fall through to overflow
         for threshold, m in tiers:
             if loads_today == threshold:
@@ -597,6 +612,40 @@ class WashingMachineCoordinator(DataUpdateCoordinator[PersistedState]):
         self._state.total_washes = max(0, int(total))
         await self._save()
         await self.async_request_refresh()
+
+    # --- Per-notification test helpers (for button entities) ---
+    def test_notify_started(self) -> None:
+        self._notify(title="🧺 Washing Machine Started (test)",
+                     message="The washing machine has started a cycle.",
+                     level="passive")
+
+    def test_notify_done(self) -> None:
+        avg = self.average_cycle_minutes() or 78.0
+        self._notify(title="✅ Washing Machine Done! (test)",
+                     message=f"Cycle completed in {int(round(avg))} minutes. Your laundry is ready!",
+                     level="active")
+
+    def test_notify_reminder(self) -> None:
+        pool = self.reminder_pool
+        msg = random.choice(pool) if pool else random.choice(REMINDER_MESSAGES)
+        self._notify(title="🧺 Laundry Reminder (test)", message=msg, level="time-sensitive")
+
+    def test_notify_thank_you(self) -> None:
+        loads_today = max(self.washes_since(
+            dt_util.as_utc(dt_util.start_of_local_day(dt_util.as_local(dt_util.utcnow())))
+        ), 1)
+        tiers = self.thank_you_tiers_all
+        msg = self.thank_you_overflow.format(n=loads_today)
+        for threshold, m in tiers:
+            if loads_today == threshold:
+                msg = m
+                break
+        self._notify(title="👏 Thank You! (test)", message=msg, level="passive")
+
+    def test_notify_error(self) -> None:
+        self._notify(title="⚠️ Washing Machine Alert (test)",
+                     message=f"Cycle has been running for over {self.error_duration_h} hours. Please check the machine.",
+                     level="critical", tag=NOTIFY_ERROR_TAG)
 
     async def async_simulate_cycle(self) -> None:
         """Force-walk the state machine start → done → door-open for testing."""

@@ -34,6 +34,7 @@ def _make_ha_stubs():
 
     class _Platform:
         BINARY_SENSOR = "binary_sensor"
+        BUTTON = "button"
         SENSOR = "sensor"
         SWITCH = "switch"
     ha_const.Platform = _Platform
@@ -223,6 +224,9 @@ def _make_ha_stubs():
     )
     sys.modules["homeassistant.components.switch"].SwitchEntity = object
     sys.modules["homeassistant.helpers.entity_platform"].AddEntitiesCallback = object
+    m = types.ModuleType("homeassistant.components.button")
+    m.ButtonEntity = object
+    sys.modules["homeassistant.components.button"] = m
 
 
 _make_ha_stubs()

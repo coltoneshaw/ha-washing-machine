@@ -18,8 +18,9 @@
           "error_duration_h": "Error timeout (hours)",
           "door_open_state": "Door sensor open state",
           "starting_total": "Starting total washes (migration)",
-          "extra_reminders": "Extra reminder messages (one per line)",
-          "extra_thank_you": "Extra thank-you tiers (line 1 = 6 loads, line 2 = 7, ...)"
+          "reminder_messages": "Reminder messages (one per line — edit or add freely; blank = use defaults)",
+          "thank_you_tiers": "Thank-you tier messages (line 1 = 1 load/day, line 2 = 2 loads, ...; blank = use defaults)",
+          "thank_you_overflow": "Thank-you overflow message (for N+ loads beyond the tier list; use {n} for the count)"
         }
       }
     }
@@ -42,8 +43,9 @@
           "error_duration_h": "Error timeout (hours)",
           "door_open_state": "Door sensor open state",
           "starting_total": "Starting total washes",
-          "extra_reminders": "Extra reminder messages (one per line)",
-          "extra_thank_you": "Extra thank-you tiers (line 1 = 6 loads, line 2 = 7, ...)"
+          "reminder_messages": "Reminder messages (one per line)",
+          "thank_you_tiers": "Thank-you tier messages (line 1 = 1 load, line 2 = 2, ...)",
+          "thank_you_overflow": "Thank-you overflow message (use {n} for count)"
         }
       }
     }

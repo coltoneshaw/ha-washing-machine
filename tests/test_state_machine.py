@@ -239,44 +239,67 @@ async def test_reset_error(coord, hass, clock):
 
 
 @pytest.mark.asyncio
-async def test_extra_reminders_merged_into_pool(hass, entry, clock):
-    """Extra reminder messages get appended to the default pool."""
-    entry.options = {C.CONF_EXTRA_REMINDERS: "Custom message A\nCustom message B"}
+async def test_full_reminder_list_override(hass, entry, clock):
+    """When reminder_messages is set, it replaces defaults entirely."""
+    entry.options = {C.CONF_REMINDER_MESSAGES: "Only mine A\nOnly mine B"}
     from washing_machine.coordinator import WashingMachineCoordinator
     c = WashingMachineCoordinator(hass, entry)
     await c.async_load()
     pool = c.reminder_pool
-    assert "Custom message A" in pool
-    assert "Custom message B" in pool
-    # Defaults preserved
+    assert pool == ["Only mine A", "Only mine B"]
+
+
+@pytest.mark.asyncio
+async def test_reminder_list_blank_falls_back_to_defaults(hass, entry, clock):
+    """Blank reminder_messages falls back to defaults."""
+    entry.options = {C.CONF_REMINDER_MESSAGES: ""}
+    from washing_machine.coordinator import WashingMachineCoordinator
+    c = WashingMachineCoordinator(hass, entry)
+    await c.async_load()
+    assert len(c.reminder_pool) == 10  # defaults
+
+
+@pytest.mark.asyncio
+async def test_legacy_extras_still_honored(hass, entry, clock):
+    """v0.2.x CONF_EXTRA_REMINDERS still works when new config is unset."""
+    entry.options = {C.CONF_EXTRA_REMINDERS: "Legacy A\nLegacy B"}
+    from washing_machine.coordinator import WashingMachineCoordinator
+    c = WashingMachineCoordinator(hass, entry)
+    await c.async_load()
+    pool = c.reminder_pool
+    assert "Legacy A" in pool
+    assert "Legacy B" in pool
     assert len(pool) == 10 + 2
 
 
 @pytest.mark.asyncio
-async def test_extra_thank_you_tiers(hass, entry, clock):
-    """Extra thank-you tiers start at load count 6."""
-    entry.options = {C.CONF_EXTRA_THANK_YOU: "Six loads!\nSeven loads!"}
+async def test_full_thank_you_list_override(hass, entry, clock):
+    """thank_you_tiers: line N = message for N loads."""
+    entry.options = {C.CONF_THANK_YOU_TIERS: "One\nTwo\nThree"}
     from washing_machine.coordinator import WashingMachineCoordinator
     c = WashingMachineCoordinator(hass, entry)
     await c.async_load()
     tiers = c.thank_you_tiers_all
-    assert (6, "Six loads!") in tiers
-    assert (7, "Seven loads!") in tiers
-    # Existing 1-5 tiers preserved
-    assert len([t for t in tiers if t[0] <= 5]) == 5
+    assert (1, "One") in tiers
+    assert (2, "Two") in tiers
+    assert (3, "Three") in tiers
+    assert len(tiers) == 3
 
 
 @pytest.mark.asyncio
-async def test_extra_config_list_or_string(hass, entry, clock):
-    """Extra config accepts both list and string formats (defensive parsing)."""
-    entry.options = {C.CONF_EXTRA_REMINDERS: ["List item 1", "List item 2", ""]}
-    from washing_machine.coordinator import WashingMachineCoordinator
-    c = WashingMachineCoordinator(hass, entry)
-    await c.async_load()
-    pool = c.reminder_pool
-    assert "List item 1" in pool
-    assert "List item 2" in pool
-    assert "" not in pool  # blank entries filtered
+async def test_test_notify_methods_do_not_crash(coord, hass, clock):
+    """All test_notify_* methods dispatch service calls without errors."""
+    import asyncio
+    await coord.async_config_entry_first_refresh()
+    hass.services.async_call.reset_mock()
+    coord.test_notify_started()
+    coord.test_notify_done()
+    coord.test_notify_reminder()
+    coord.test_notify_thank_you()
+    coord.test_notify_error()
+    await asyncio.sleep(0)
+    # Expect 5 notify calls (one per test method)
+    assert hass.services.async_call.await_count == 5
 
 
 @pytest.mark.asyncio

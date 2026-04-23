@@ -18,8 +18,9 @@
           "error_duration_h": "Error timeout (hours)",
           "door_open_state": "Door sensor open state",
           "starting_total": "Starting total washes (migration seed, 0 = fresh)",
-          "extra_reminders": "Extra reminder messages (one per line — added to the 10 defaults; a random one is picked each hour)",
-          "extra_thank_you": "Extra thank-you tiers (one per line — first line = 6 loads/day, second = 7, and so on)"
+          "reminder_messages": "Reminder messages (one per line — pre-filled with defaults; edit, delete, or add. A random one is picked each hour.)",
+          "thank_you_tiers": "Thank-you tier messages (line 1 = 1 load/day, line 2 = 2 loads, line 3 = 3, etc.)",
+          "thank_you_overflow": "Thank-you overflow message for N+ loads beyond the tier list ({n} is replaced with the count)"
         }
       }
     }
@@ -42,8 +43,9 @@
           "error_duration_h": "Error timeout (hours)",
           "door_open_state": "Door sensor open state",
           "starting_total": "Starting total washes",
-          "extra_reminders": "Extra reminder messages (one per line)",
-          "extra_thank_you": "Extra thank-you tiers (line 1 = 6 loads/day, line 2 = 7, ...)"
+          "reminder_messages": "Reminder messages (one per line)",
+          "thank_you_tiers": "Thank-you tier messages",
+          "thank_you_overflow": "Thank-you overflow message (use {n} for count)"
         }
       }
     }

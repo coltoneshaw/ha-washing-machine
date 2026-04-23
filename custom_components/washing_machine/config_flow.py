@@ -17,11 +17,13 @@ from .const import (
     CONF_END_POWER_W, CONF_END_DURATION_S,
     CONF_REMINDER_INTERVAL_M, CONF_REMINDER_START_HOUR, CONF_REMINDER_END_HOUR,
     CONF_ERROR_DURATION_H, CONF_DOOR_OPEN_STATE, CONF_STARTING_TOTAL,
+    CONF_REMINDER_MESSAGES, CONF_THANK_YOU_TIERS, CONF_THANK_YOU_OVERFLOW,
     CONF_EXTRA_REMINDERS, CONF_EXTRA_THANK_YOU,
     DEFAULT_START_POWER_W, DEFAULT_START_DURATION_S,
     DEFAULT_END_POWER_W, DEFAULT_END_DURATION_S,
     DEFAULT_REMINDER_INTERVAL_M, DEFAULT_REMINDER_START_HOUR, DEFAULT_REMINDER_END_HOUR,
     DEFAULT_ERROR_DURATION_H, DEFAULT_DOOR_OPEN_STATE,
+    REMINDER_MESSAGES, THANK_YOU_TIERS, THANK_YOU_OVERFLOW,
 )
 
 
@@ -114,12 +116,16 @@ def _base_schema(defaults: dict | None = None, notify_options: list[str] | None 
             selector.NumberSelector(
                 selector.NumberSelectorConfig(min=0, max=1000000, step=1, mode="box")
             ),
-        vol.Optional(CONF_EXTRA_REMINDERS,
-                     default=d.get(CONF_EXTRA_REMINDERS, "")):
+        # Pre-populate defaults so user can edit existing messages, not just append
+        vol.Optional(CONF_REMINDER_MESSAGES,
+                     default=d.get(CONF_REMINDER_MESSAGES) or "\n".join(REMINDER_MESSAGES)):
             selector.TextSelector(selector.TextSelectorConfig(multiline=True)),
-        vol.Optional(CONF_EXTRA_THANK_YOU,
-                     default=d.get(CONF_EXTRA_THANK_YOU, "")):
+        vol.Optional(CONF_THANK_YOU_TIERS,
+                     default=d.get(CONF_THANK_YOU_TIERS) or "\n".join(msg for _, msg in THANK_YOU_TIERS)):
             selector.TextSelector(selector.TextSelectorConfig(multiline=True)),
+        vol.Optional(CONF_THANK_YOU_OVERFLOW,
+                     default=d.get(CONF_THANK_YOU_OVERFLOW) or THANK_YOU_OVERFLOW):
+            selector.TextSelector(selector.TextSelectorConfig(multiline=False)),
     })
 
 
